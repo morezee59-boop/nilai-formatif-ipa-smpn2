@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluasi & Rekap Pembelajaran IPA - SMP Negeri 2 Belang</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-teal-100 min-h-screen py-6 px-4">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-emerald-100">
+        
+        <!-- Header / Banner Sekolah -->
+        <div class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white p-5 text-center relative">
+            <h1 class="text-xl md:text-2xl font-bold tracking-wide">SMP NEGERI 2 BELANG</h1>
+            <p class="text-emerald-200 text-xs md:text-sm mt-1">Sistem Evaluasi & Analisis Pembelajaran IPA Berbasis Game</p>
+            <div class="mt-3 text-xs bg-emerald-900/50 inline-block px-3 py-1 rounded-full border border-emerald-600/50">
+                Guru Mapel: <span class="font-semibold text-white">Nofri Yanto Tora</span> | Kasek: <span class="font-semibold text-white">Metty Astuti, S.Pd</span>
+            </div>
+            
+            <!-- Tombol Navigasi Mode Siswa / Guru -->
+            <div class="mt-4 flex justify-center gap-2">
+                <button onclick="switchView('siswa')" id="btnViewSiswa" class="bg-emerald-900 text-xs px-3 py-1.5 rounded-lg border border-emerald-600 font-medium transition">Form Siswa</button>
+                <button onclick="switchView('guru')" id="btnViewGuru" class="bg-teal-800/80 text-xs px-3 py-1.5 rounded-lg border border-teal-600 font-medium transition">Dashboard Guru</button>
+            </div>
+        </div>
+
+        <!-- CONTAINER 1: FORMULIR SISWA -->
+        <div id="viewSiswa" class="p-6 md:p-8">
+            <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-600 p-4 rounded-r-xl">
+                <h2 class="font-semibold text-emerald-900 text-sm md:text-base">Petunjuk Pengisian:</h2>
+                <p class="text-xs md:text-sm text-emerald-700 mt-1">Jawablah pertanyaan berikut dengan jujur sesuai pengalaman belajar IPA Anda di kelas (Pilih kelas <strong>VIII B</strong> atau <strong>VIII C</strong>).</p>
+            </div>
+
+            <form id="evaluasiForm" class="space-y-6">
+                <!-- Identitas Siswa -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div>
+                        <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1">Nama Lengkap Siswa</label>
+                        <input type="text" id="namaSiswa" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm" placeholder="Masukkan nama lengkap...">
+                    </div>
+                    <div>
+                        <label class="block text-xs md:text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                        <select id="kelasSiswa" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm">
+                            <option value="">-- Pilih Kelas --</option>
+                            <option value="VIII B">Kelas VIII B</option>
+                            <option value="VIII C">Kelas VIII C</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr class="border-gray-200 my-4">
+
+                <!-- Daftar Pertanyaan -->
+                <div id="soalContainer" class="space-y-6"></div>
+
+                <div class="pt-4">
+                    <button type="submit" id="submitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition duration-300 shadow-md text-sm md:text-base">
+                        Kirim Evaluasi Pembelajaran
+                    </button>
+                </div>
+            </form>
+
+            <!-- Pesan Sukses -->
+            <div id="successMessage" class="hidden text-center py-10 space-y-4">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
+                <h3 class="text-xl font-bold text-gray-800">Terima Kasih!</h3>
+                <p class="text-gray-600 text-sm">Jawaban evaluasi pembelajaran IPA Anda telah berhasil disimpan otomatis ke sistem.</p>
+                <button onclick="location.reload()" class="px-6 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700">Isi Tanggapan Lain</button>
+            </div>
+        </div>
+
+        <!-- CONTAINER 2: DASHBOARD & REKAPITULASI GURU -->
+        <div id="viewGuru" class="p-6 md:p-8 hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-teal-50 p-4 rounded-xl border border-teal-200">
+                <div>
+                    <h2 class="text-base md:text-lg font-bold text-teal-900">Dashboard Analisis & Rekapitulasi Evaluasi</h2>
+                    <p class="text-xs text-teal-700 mt-0.5">Hasil pengolahan data otomatis dari siswa kelas VIII B dan VIII C.</p>
+                </div>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <select id="filterKelas" onchange="loadRekapData()" class="px-3 py-1.5 text-xs md:text-sm bg-white border border-teal-300 rounded-lg focus:outline-none flex-1">
+                        <option value="SEMUA">Semua Kelas (VIII B & C)</option>
+                        <option value="VIII B">Kelas VIII B</option>
+                        <option value="VIII C">Kelas VIII C</option>
+                    </select>
+                    <button onclick="loadRekapData()" class="bg-teal-700 text-white text-xs md:text-sm px-4 py-1.5 rounded-lg hover:bg-teal-800 transition">Muat</button>
+                </div>
+            </div>
+
+            <!-- Ringkasan Statistik -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <p class="text-xs text-gray-500 uppercase font-semibold">Total Responden</p>
+                    <h3 id="statTotalResponden" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <p class="text-xs text-gray-500 uppercase font-semibold">Rata-rata Skor Keseluruhan</p>
+                    <h3 id="statRataRata" class="text-2xl font-bold text-teal-600 mt-1">0.0</h3>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <p class="text-xs text-gray-500 uppercase font-semibold">Efektivitas Media Game</p>
+                    <h3 id="statGameScore" class="text-2xl font-bold text-blue-600 mt-1">0.0</h3>
+                </div>
+            </div>
+
+            <!-- KOTAK ANALISIS DESKRIPTIF & REKOMENDASI PERBAIKAN -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 space-y-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📊</span>
+                    <h3 class="font-bold text-amber-900 text-sm md:text-base">Analisis Deskriptif & Poin Perbaikan Pembelajaran</h3>
+                </div>
+                <div id="deskripsiAnalisis" class="text-xs md:text-sm text-amber-950 space-y-2 leading-relaxed">
+                    <p class="italic text-gray-500">Memuat analisis data...</p>
+                </div>
+            </div>
+
+            <!-- Tabel Detail Rekap per Aspek Pertanyaan -->
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 font-semibold text-xs md:text-sm text-gray-700">
+                    Rata-rata Skor per Butir Pertanyaan
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-[10px] md:text-xs uppercase">
+                                <th class="p-3">No</th>
+                                <th class="p-3">Indikator Pertanyaan</th>
+                                <th class="p-3 text-center">Skor Rata-rata</th>
+                                <th class="p-3">Kategori</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelRekapBody" class="divide-y divide-gray-200 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT PROGRAM UTAMA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "API_KEY_ANDA",
+            authDomain: "PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com/",
+            projectId: "PROJECT_ID",
+            storageBucket: "PROJECT_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const daftarPertanyaan = [
+            "Saya mempersiapkan diri dengan membaca materi IPA sebelum pertemuan dimulai.",
+            "Saya aktif mencatat poin-poin penting yang dijelaskan oleh guru selama proses pembelajaran.",
+            "Saya merasa antusias dan termotivasi mengikuti kegiatan pembelajaran IPA di kelas.",
+            "Saya memahami materi IPA dengan lebih baik ketika guru menggunakan metode diskusi atau eksperimen.",
+            "Media ajar game edukasi yang digunakan guru membuat suasana belajar IPA lebih menyenangkan.",
+            "Game pembelajaran IPA membantu saya lebih cepat memahami konsep materi yang sulit.",
+            "Saya aktif berpartisipasi dan berinteraksi saat sesi game atau kuis interaktif di kelas.",
+            "Saya mengalami kendala teknis atau kesulitan memahami cara bermain saat media game digunakan.",
+            "Saya mengulang kembali materi atau konsep game IPA yang telah dipelajari setelah jam pelajaran usai.",
+            "Secara keseluruhan, metode dan media pembelajaran IPA pertemuan ini sangat efektif bagi saya."
+        ];
+
+        const opsiSkala = [
+            { label: "Sangat Sering", val: 4 },
+            { label: "Sering", val: 3 },
+            { label: "Jarang", val: 2 },
+            { label: "Tidak Pernah", val: 1 }
+        ];
+
+        const soalContainer = document.getElementById('soalContainer');
+        daftarPertanyaan.forEach((soal, index) => {
+            let optionsHtml = opsiSkala.map(opsi => `
+                <label class="flex items-center space-x-2 p-2 rounded-lg hover:bg-emerald-50 cursor-pointer transition text-xs md:text-sm">
+                    <input type="radio" name="soal_${index + 1}" value="${opsi.val}" required class="text-emerald-600 focus:ring-emerald-500 h-4 w-4">
+                    <span>${opsi.label}</span>
+                </label>
+            `).join('');
+
+            soalContainer.innerHTML += `
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <p class="text-xs md:text-sm font-semibold text-gray-800 mb-3">${index + 1}. ${soal}</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        window.switchView = function(view) {
+            if(view === 'siswa') {
+                document.getElementById('viewSiswa').classList.remove('hidden');
+                document.getElementById('viewGuru').classList.add('hidden');
+                document.getElementById('btnViewSiswa').classList.add('bg-emerald-900');
+                document.getElementById('btnViewGuru').classList.remove('bg-teal-900');
+            } else {
+                document.getElementById('viewSiswa').classList.add('hidden');
+                document.getElementById('viewGuru').classList.remove('hidden');
+                document.getElementById('btnViewGuru').classList.add('bg-teal-900');
+                document.getElementById('btnViewSiswa').classList.remove('bg-emerald-900');
+                loadRekapData();
+            }
+        }
+
+        const form = document.getElementById('evaluasiForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Menyimpan Data...";
+
+            const nama = document.getElementById('namaSiswa').value;
+            const kelas = document.getElementById('kelasSiswa').value;
+            const timestamp = new Date().toISOString();
+
+            let jawabanData = {};
+            for (let i = 1; i <= 10; i++) {
+                const selected = document.querySelector(`input[name="soal_${i}"]:checked`);
+                jawabanData[`soal_${i}`] = selected ? parseInt(selected.value) : 0;
+            }
+
+            try {
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Waktu habis. Periksa koneksi atau Firebase Rules Anda.")), 10000)
+                );
+
+                const savePromise = async () => {
+                    const evaluasiRef = ref(db, 'evaluasi_ipa');
+                    await set(push(evaluasiRef), { 
+                        namaSiswa: nama, 
+                        kelasSiswa: kelas, 
+                        waktuPengisian: timestamp, 
+                        jawaban: jawabanData 
+                    });
+                };
+
+                await Promise.race([savePromise(), timeoutPromise]);
+
+                form.classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                alert("Gagal menyimpan data: " + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Kirim Evaluasi Pembelajaran";
+            }
+        });
+
+        window.loadRekapData = async function() {
+            const filterKelas = document.getElementById('filterKelas').value;
+            const tbody = document.getElementById('tabelRekapBody');
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">Mengambil data dari Firebase...</td></tr>`;
+
+            try {
+                const dbRef = ref(db, 'evaluasi_ipa');
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Koneksi timeout saat memuat data.")), 10000)
+                );
+
+                const snapshot = await Promise.race([get(dbRef), timeoutPromise]);
+
+                if (!snapshot.exists()) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">Belum ada data evaluasi masuk.</td></tr>`;
+                    document.getElementById('statTotalResponden').textContent = '0';
+                    document.getElementById('statRataRata').textContent = '0.0';
+                    document.getElementById('statGameScore').textContent = '0.0';
+                    document.getElementById('deskripsiAnalisis').innerHTML = `<p class="text-gray-600">Belum ada data untuk dianalisis.</p>`;
+                    return;
+                }
+
+                let totalResponden = 0;
+                let jumlahPerSoal = new Array(10).fill(0);
+                let jumlahGameScore = 0; 
+                let countGameScore = 0;
+
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    if (data && data.jawaban && (filterKelas === 'SEMUA' || data.kelasSiswa === filterKelas)) {
+                        totalResponden++;
+                        for (let i = 1; i <= 10; i++) {
+                            let val = parseInt(data.jawaban[`soal_${i}`]) || 0;
+                            jumlahPerSoal[i - 1] += val;
+                            if (i >= 5 && i <= 7) {
+                                jumlahGameScore += val;
+                                countGameScore++;
+                            }
+                        }
+                    }
+                });
+
+                if (totalResponden === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">Tidak ada data untuk kelas ${filterKelas}.</td></tr>`;
+                    document.getElementById('statTotalResponden').textContent = '0';
+                    document.getElementById('statRataRata').textContent = '0.0';
+                    document.getElementById('statGameScore').textContent = '0.0';
+                    document.getElementById('deskripsiAnalisis').innerHTML = `<p class="text-gray-600">Tidak ada data untuk kelas ini.</p>`;
+                    return;
+                }
+
+                let rataRataPerSoal = jumlahPerSoal.map(total => total / totalResponden);
+                let totalSkorSemua = rataRataPerSoal.reduce((a, b) => a + b, 0);
+                let rataRataTotal = totalSkorSemua / 10;
+                let rataRataGame = countGameScore > 0 ? (jumlahGameScore / countGameScore).toFixed(1) : '0.0';
+
+                document.getElementById('statTotalResponden').textContent = totalResponden;
+                document.getElementById('statRataRata').textContent = rataRataTotal.toFixed(2);
+                document.getElementById('statGameScore').textContent = rataRataGame;
+
+                tbody.innerHTML = '';
+                let analitikPoinPerbaikan = [];
+
+                rataRataPerSoal.forEach((skor, idx) => {
+                    let kategori = "";
+                    let warnaBadge = "";
+                    if (skor >= 3.25) { kategori = "Sangat Baik"; warnaBadge = "bg-emerald-100 text-emerald-800"; }
+                    else if (skor >= 2.5) { kategori = "Baik"; warnaBadge = "bg-teal-100 text-teal-800"; }
+                    else if (skor >= 1.75) { kategori = "Cukup"; warnaBadge = "bg-yellow-100 text-yellow-800"; }
+                    else { kategori = "Kurang"; warnaBadge = "bg-red-100 text-red-800"; }
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-3 font-medium">${idx + 1}</td>
+                            <td class="p-3">${daftarPertanyaan[idx]}</td>
+                            <td class="p-3 text-center font-bold">${skor.toFixed(2)}</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold ${warnaBadge}">${kategori}</span></td>
+                        </tr>
+                    `;
+
+                    if (skor < 2.75) {
+                        analitikPoinPerbaikan.push({ no: idx + 1, teks: daftarPertanyaan[idx], skor: skor.toFixed(2) });
+                    }
+                });
+
+                let htmlDeskripsi = `<p class="font-semibold text-amber-900">Berdasarkan data ${totalResponden} siswa (${filterKelas}):</p><ul class="list-disc pl-5 space-y-1">`;
+                
+                if (analitikPoinPerbaikan.length === 0) {
+                    htmlDeskripsi += `<li>Seluruh proses pembelajaran dan media game menunjukkan hasil yang <strong>sangat baik</strong>. Pertahankan metode ini!</li>`;
+                } else {
+                    htmlDeskripsi += `<li>Poin aspek yang perlu diperhatikan / ditingkatkan pada pertemuan berikutnya:</li>`;
+                    analitikPoinPerbaikan.forEach(item => {
+                        htmlDeskripsi += `<li class="mt-1"><strong>Soal #${item.no}</strong> (Skor: ${item.skor}). <span class="text-amber-800 font-medium">Rekomendasi:</span> Tingkatkan bimbingan atau evaluasi kembali metode pada aspek ini.</li>`;
+                    });
+                }
+                htmlDeskripsi += `</ul>`;
+                document.getElementById('deskripsiAnalisis').innerHTML = htmlDeskripsi;
+
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Gagal memuat data. Periksa aturan Firebase Rules Anda.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
